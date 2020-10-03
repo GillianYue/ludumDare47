@@ -14,15 +14,18 @@ public class DialoguePlacer : MonoBehaviour
     private int lengthOfText;
     private float fadeInTime = .1f;
     private float fadeOutTime = 1f;
-
-    public void Initalize(string text)
+    private DialogueManager dialogue;
+    private bool god;
+    private string text;
+    public void Initalize(string text, bool god)
     {
-
+        this.text = text;
+        dialogue = this.transform.parent.GetComponentInParent<DialogueManager>();
         textToDisplay = text.ToCharArray();
 
         lengthOfText = textToDisplay.Length;
         StartCoroutine(DisplayText());
-
+        this.god = god;
     }
 
 
@@ -49,12 +52,13 @@ public class DialoguePlacer : MonoBehaviour
             yield return new WaitForSeconds(.1f);
             FadeCharacter(textToDisplay[i]);
         }
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(textToDisplay.Length * .01f);
         StartCoroutine(RemoveText());
 
     }
     private void DestroyText()
     {
+        SendMessage();
         textDisplay.color = Color.clear;
         Destroy(this.transform.parent.gameObject);
 
@@ -72,5 +76,9 @@ public class DialoguePlacer : MonoBehaviour
 
         }
         DestroyText();
+    }
+    private void SendMessage()
+    {
+        dialogue.StartNewDialogue(text, !god);
     }
 }
