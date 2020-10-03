@@ -6,28 +6,41 @@ using System.Collections;
 [System.Serializable]
 public class InSceneLevel : MonoBehaviour {
 
-    public Transform m_StartPoint;
     public enum levelType { DRUM, PAD, BASS };
     public levelType type;
 
-    public int[] puzzle;
-    public int dx;
+    public string puzzleSource;
+    private int[] puzzle;
+    public int dx, dxNoise, startDistance;
+
+    public GeometrySpawner geometrySpawner;
+
+
+    void Start()
+    {
+        puzzle = new int[puzzleSource.Length];
+
+        char[] ca = puzzleSource.ToCharArray();
+        for (int c = 0; c<puzzleSource.Length; c++)
+        {
+            int.TryParse(puzzleSource.Substring(c, 1), out puzzle[c]);
+        }
+
+    }
 
     public void setupLevel()
     {
-
+        StartCoroutine(putPuzzlesInPlace());
     }
 
     private IEnumerator putPuzzlesInPlace()
     {
-        switch (type)
+        Vector3 start = geometrySpawner.getStartOrigin() + new Vector3(startDistance, 0, 0);
+
+        for(int a=0; a<16; a++)
         {
-            case levelType.DRUM:
-                break;
-            case levelType.PAD:
-                break;
-            case levelType.BASS:
-                break;
+            Vector3 currX = new Vector3(start.x + a * dx + Random.Range(0, dxNoise), start.y, start.z);
+            geometrySpawner.spawnStone(type, currX, new Vector3(0, 0, Random.Range(-20, 20)), puzzle[a]);
         }
 
 
@@ -37,15 +50,4 @@ public class InSceneLevel : MonoBehaviour {
 
 
 
-
-
-
-    void OnDrawGizmos()
-    {
-        if (m_StartPoint != null)
-        {
-            Gizmos.color = Color.Lerp(Color.red, Color.white, 0.7f);
-            Gizmos.DrawWireSphere(m_StartPoint.position, 0.5f);
-        }
-    }
 }

@@ -83,7 +83,7 @@ public class InSceneLevelSwitcher : MonoBehaviour {
         {
             return;
         }
-        m_Character.SpawnAndResetAtPosition(m_Levels[a_Index].m_StartPoint.position);
+        //m_Character.SpawnAndResetAtPosition(m_Levels[a_Index].m_StartPoint.position);
 		m_CurrentIndex = a_Index;
         if (OnLevelStart != null)
         {
