@@ -13,17 +13,18 @@ public class DialoguePlacer : MonoBehaviour
     [SerializeField] TMPro.TextMeshProUGUI textDisplay;
     private int lengthOfText;
     private float fadeInTime = .1f;
+    private float fadeOutTime = 1f;
 
     public void Initalize(string text)
     {
-        
+
         textToDisplay = text.ToCharArray();
 
         lengthOfText = textToDisplay.Length;
         StartCoroutine(DisplayText());
+
     }
 
-    
 
     private void FadeCharacter(char character)
     {
@@ -34,22 +35,42 @@ public class DialoguePlacer : MonoBehaviour
         {
             textDisplay.text = currentText;
             Color color = Color.Lerp(Color.clear, originalColor, Mathf.Min(1, t / fadeInTime));
-            grexText = "<color=#"+ ColorUtility.ToHtmlStringRGBA(color) + ">" + character + "</color>";
+            grexText = "<color=#" + ColorUtility.ToHtmlStringRGBA(color) + ">" + character + "</color>";
             textDisplay.text = textDisplay.text + grexText;
         }
-        grexText = "<color=#" + ColorUtility.ToHtmlStringRGBA(originalColor) + ">" + character + "</color>";
         textDisplay.text = currentText;
-        textDisplay.text = textDisplay.text + grexText;
+        textDisplay.text = textDisplay.text + character;
     }
 
     private IEnumerator DisplayText()
     {
-        for(int i = 0; i < lengthOfText; i++)
+        for (int i = 0; i < lengthOfText; i++)
         {
             yield return new WaitForSeconds(.1f);
             FadeCharacter(textToDisplay[i]);
         }
-        
+        yield return new WaitForSeconds(5f);
+        StartCoroutine(RemoveText());
+
     }
-    
+    private void DestroyText()
+    {
+        textDisplay.color = Color.clear;
+        Destroy(this.transform.parent.gameObject);
+
+    }
+    private IEnumerator RemoveText()
+    {
+        Color originalColor = textDisplay.color;
+        for (float t = 0.01f; t < fadeOutTime; t += Time.deltaTime)
+        {
+            
+            Color color = Color.Lerp(originalColor, Color.clear, Mathf.Min(1, t / fadeOutTime));
+            textDisplay.color = color;
+            yield return null;
+
+
+        }
+        DestroyText();
+    }
 }

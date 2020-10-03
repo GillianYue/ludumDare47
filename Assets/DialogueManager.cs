@@ -25,17 +25,17 @@ public class DialogueManager : MonoBehaviour
 
     [SerializeField] GameObject _DisplayPrefab;
     // Start is called before the first frame update
+    void createNewText(string text)
+    {
+        GameObject display =  Instantiate(_DisplayPrefab, transform.position, Quaternion.identity, transform);
+        display.transform.GetChild(0).GetComponent<DialoguePlacer>().Initalize(text);
+    }
+
     void Start()
     {
-        GameObject display =  Instantiate(_DisplayPrefab, transform.position, Quaternion.identity, this.transform);
-        
-        
-        display.transform.GetChild(0).GetComponent<DialoguePlacer>().Initalize("chicken");
+        createNewText("Chicken!");
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
 }
