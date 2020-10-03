@@ -25,10 +25,10 @@ public class GameController : MonoBehaviour
         return g_gameController;
     }
 
-    [SerializeField] Transform m_Camera = null;
+    [SerializeField] public Transform m_Camera = null;
     public GeometrySpawner geometrySpawn;
     public int currLevel, SkillLv; //instrumentLv indicates how many instruments have been unlocked
-    public Vector3 playerStartPosOffset; //offset between player view (camera) spawn pos for each level and the floor spawn pos
+    [HideInInspector] public Vector3 playerStartPosOffset; //offset between player view (camera) spawn pos for each level and the floor spawn pos
 
     //indices for instruments: 
 
@@ -36,8 +36,15 @@ public class GameController : MonoBehaviour
     {
         playerStartPosOffset = m_Camera.transform.position - geometrySpawn.getStartOrigin(); //assumes camera on start is in its place
 
-        StartLevel(currLevel);
+        StartCoroutine(initialize());
+    }
 
+    IEnumerator initialize()
+    {
+        bool[] done = new bool[1];
+        StartCoroutine(m_Levels[currLevel].setupLevel(done));
+        yield return new WaitUntil(() => done[0]);
+        StartLevel(currLevel);
     }
 
     void OnGUI()
@@ -61,7 +68,7 @@ public class GameController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            ascendFloor();
+            StartCoroutine(ascendFloor());
         }
     }
 
@@ -76,15 +83,17 @@ public class GameController : MonoBehaviour
 
     }
 
-    public void ascendFloor()
+    public IEnumerator ascendFloor()
     {
         currLevel++;
         geometrySpawn.spawnNewFloor(currLevel);
-        m_Levels[currLevel].setupLevel();
+        bool[] done = new bool[1];
+        StartCoroutine(m_Levels[currLevel].setupLevel(done));
+        yield return new WaitUntil(() => done[0]);
         StartLevel(currLevel);
     }
 
-    void CorrectCamera()
+    public void CorrectCamera()
     {
         Vector3 diff = geometrySpawn.getCameraLookat(currLevel, playerStartPosOffset) - m_Camera.transform.position;
         diff.z = 0;
