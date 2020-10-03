@@ -1,11 +1,14 @@
-﻿using System.Collections;
+﻿using System.CodeDom;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class DialogueManager : MonoBehaviour
 {
+
     Dictionary<string, string> npcLines = new Dictionary<string, string>()
     {
+        {"move there no", "I am sorry but it is impossible!" },
         {"move there ok", "I shall do as you command." },
         {"Put 1 there", "As you wish, my lord." },
         {"Put 2 there", "whatever you wish." },
@@ -24,7 +27,10 @@ public class DialogueManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        GameObject display =  Instantiate(_DisplayPrefab, transform.position, Quaternion.identity, this.transform);
         
+        
+        display.transform.GetChild(0).GetComponent<DialoguePlacer>().Initalize("chicken");
     }
 
     // Update is called once per frame

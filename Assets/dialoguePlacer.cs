@@ -1,59 +1,55 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 
-public class dialoguePlacer : MonoBehaviour
+public class DialoguePlacer : MonoBehaviour
 {
     // Start is called before the first frame update
 
     private char[] textToDisplay;
-    private TMPro.TextMeshPro textDisplay;
+    [SerializeField] TMPro.TextMeshProUGUI textDisplay;
     private int lengthOfText;
-    private Text text;
-    private float fadeInTime = .04f;
+    private float fadeInTime = .1f;
 
     public void Initalize(string text)
     {
+        
         textToDisplay = text.ToCharArray();
 
         lengthOfText = textToDisplay.Length;
         StartCoroutine(DisplayText());
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        textDisplay = GetComponent<TMPro.TextMeshPro>();
-        text = GetComponent<Text>();
-    }
+    
 
-    private IEnumerator FadeCharacter(char character)
+    private void FadeCharacter(char character)
     {
-        Color originalColor = text.color;
-        string grexText = "<color = clear>" + character + "</color>";
-        string currentText = text.text;
-        text.text = text.text + grexText;
+        Color originalColor = textDisplay.color;
+        string grexText;
+        string currentText = textDisplay.text;
         for (float t = 0.01f; t < fadeInTime; t += Time.deltaTime)
         {
-            text.text = currentText;
-            Color color = Color.Lerp(originalColor, Color.clear, Mathf.Min(1, t / fadeInTime));
-            grexText = "<color = "+ ColorUtility.ToHtmlStringRGBA(color) + ">" + character + "</color>";
-            text.text = text.text + grexText;
-            yield return null;
+            textDisplay.text = currentText;
+            Color color = Color.Lerp(Color.clear, originalColor, Mathf.Min(1, t / fadeInTime));
+            grexText = "<color=#"+ ColorUtility.ToHtmlStringRGBA(color) + ">" + character + "</color>";
+            textDisplay.text = textDisplay.text + grexText;
         }
+        grexText = "<color=#" + ColorUtility.ToHtmlStringRGBA(originalColor) + ">" + character + "</color>";
+        textDisplay.text = currentText;
+        textDisplay.text = textDisplay.text + grexText;
     }
 
     private IEnumerator DisplayText()
     {
         for(int i = 0; i < lengthOfText; i++)
         {
-            yield return new WaitForSeconds(.01f);
-            StartCoroutine(FadeCharacter(textToDisplay[i]));
-            
-
+            yield return new WaitForSeconds(.1f);
+            FadeCharacter(textToDisplay[i]);
         }
+        
     }
     
 }
