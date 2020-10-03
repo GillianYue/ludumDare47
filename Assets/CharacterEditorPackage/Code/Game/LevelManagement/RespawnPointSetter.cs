@@ -8,9 +8,9 @@ public class RespawnPointSetter : MonoBehaviour {
 
     void OnTriggerEnter()
     {
-        if (InSceneLevelSwitcher.Get())
+        if (GameController.Get())
         {
-            InSceneLevelSwitcher.Get().SetIndex(m_Index);
+            GameController.Get().SetIndex(m_Index);
         }
     }
 }
