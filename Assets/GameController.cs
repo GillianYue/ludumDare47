@@ -27,7 +27,7 @@ public class GameController : MonoBehaviour
 
     [SerializeField] Transform m_Camera = null;
     public GeometrySpawner geometrySpawn;
-    public int currLevel;
+    public int currLevel, SkillLv; //instrumentLv indicates how many instruments have been unlocked
     public Vector3 playerStartPosOffset; //offset between player view (camera) spawn pos for each level and the floor spawn pos
 
     //indices for instruments: 
@@ -59,9 +59,9 @@ public class GameController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.Return))
         {
-            Respawn();
+            ascendFloor();
         }
     }
 
@@ -75,6 +75,15 @@ public class GameController : MonoBehaviour
         StartLevel(currLevel);
 
     }
+
+    public void ascendFloor()
+    {
+        currLevel++;
+        geometrySpawn.spawnNewFloor(currLevel);
+        m_Levels[currLevel].setupLevel();
+        StartLevel(currLevel);
+    }
+
     void CorrectCamera()
     {
         Vector3 diff = geometrySpawn.getCameraLookat(currLevel, playerStartPosOffset) - m_Camera.transform.position;

@@ -5,7 +5,40 @@ using System.Collections;
 //--------------------------------------------------------------------
 [System.Serializable]
 public class InSceneLevel : MonoBehaviour {
+
     public Transform m_StartPoint;
+    public enum levelType { DRUM, PAD, BASS };
+    public levelType type;
+
+    public int[] puzzle;
+    public int dx;
+
+    public void setupLevel()
+    {
+
+    }
+
+    private IEnumerator putPuzzlesInPlace()
+    {
+        switch (type)
+        {
+            case levelType.DRUM:
+                break;
+            case levelType.PAD:
+                break;
+            case levelType.BASS:
+                break;
+        }
+
+
+        yield return new WaitForSeconds(0.1f);
+
+    }
+
+
+
+
+
 
     void OnDrawGizmos()
     {
