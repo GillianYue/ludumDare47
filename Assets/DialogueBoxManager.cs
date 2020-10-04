@@ -17,7 +17,7 @@ public class DialogueBoxManager : MonoBehaviour
         else
         {
             Debug.Log("what?");
-            transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = "Npc";
+            transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = "Spirit";
             transform.GetChild(1).GetComponent<Image>().color = Color.blue;
         }
     }
