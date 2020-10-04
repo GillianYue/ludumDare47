@@ -25,7 +25,6 @@ public class stoneBehavior : MonoBehaviour
 
     public bool checkAssign()
     {
-        Debug.Log("checking assign");
         if (intersectingSpace == null) return false;
         else transform.position = intersectingSpace.transform.position;
         index = intersectingSpace.index;

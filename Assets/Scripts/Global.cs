@@ -5,9 +5,8 @@ using UnityEngine;
 public class Global : MonoBehaviour
 {
 
-    public static IEnumerator moveToInSecs(GameObject e, int x, int y, float sec, bool[] done)
+    public static IEnumerator moveToInSecs(GameObject e, int x, int y, float sec)
     {
-        Debug.Log("moving something");
         float xDist = x - e.transform.position.x;
         float yDist = y - e.transform.position.y;
         float dx = xDist / sec;
@@ -18,12 +17,11 @@ public class Global : MonoBehaviour
         yield return new WaitForSeconds(sec);
 
         e.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0); //stops the GO at dest
-        done[0] = true;
     }
 
-    public static IEnumerator moveToInSecs(GameObject e, Vector2 dest, float sec, bool[] done)
+    public static IEnumerator moveToInSecs(GameObject e, Vector2 dest, float sec)
     {
-        return moveToInSecs(e, (int)dest.x, (int)dest.y, sec, done);
+        yield return moveToInSecs(e, (int)dest.x, (int)dest.y, sec);
     }
 
     public static void rotateAnim(GameObject e, MonoBehaviour m) { m.StartCoroutine(rotateAnimIE(e));  }

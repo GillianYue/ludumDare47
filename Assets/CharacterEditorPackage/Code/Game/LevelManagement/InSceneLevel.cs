@@ -38,20 +38,13 @@ public class InSceneLevel : MonoBehaviour {
 
     }
 
-    public IEnumerator setupLevel(bool[] done)
+    public IEnumerator setupLevel()
     {
-        Debug.Log("setting up level " + name);
-        bool[] inPlace = new bool[1];
-        StartCoroutine(putPuzzlesInPlace(inPlace));
-
-        yield return new WaitUntil(() => inPlace[0]);
+        yield return StartCoroutine(putPuzzlesInPlace());
         checkForLevelPass();
-        Debug.Log("check for level pass done");
-        done[0] = true;
-        Debug.Log("done");
     }
 
-    private IEnumerator putPuzzlesInPlace(bool[] inPlace)
+    private IEnumerator putPuzzlesInPlace()
     {
         yield return new WaitForSeconds(0.5f);
         StartCoroutine(geometrySpawner.gameController.playCurrentLoop());
@@ -71,13 +64,12 @@ public class InSceneLevel : MonoBehaviour {
         currAssignment = puzzleSpawnAssignment;
 
         yield return new WaitForSeconds(1f);
-        inPlace[0] = true;
     }
 
     private IEnumerator waitThenMoveCam(GameObject cam, float sec, Vector3 dest, float moveTime)
     {
         yield return new WaitForSeconds(sec);
-        StartCoroutine(Global.moveToInSecs(cam, dest, moveTime, new bool[1]));
+        StartCoroutine(Global.moveToInSecs(cam, dest, moveTime));
     }
 
     public void setStoneAssignment(int spot, int assignment, Transform stoneTransform)
@@ -99,7 +91,7 @@ public class InSceneLevel : MonoBehaviour {
         for(int a = 0; a<16; a++)
         {
             if (currAssignment[a] == puzzle[a]) correctCount++;
-            else Debug.Log("mismatch at " + a + ": curr " + currAssignment[1] + " and puzzle " + puzzle[a]);
+            //else Debug.Log("mismatch at " + a + ": curr " + currAssignment[1] + " and puzzle " + puzzle[a]);
         }
 
         geometrySpawner.correctNumberText.text = correctCount.ToString() + "/16";

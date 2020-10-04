@@ -46,9 +46,7 @@ public class GameController : MonoBehaviour
 
     IEnumerator initialize()
     {
-        bool[] done = new bool[1];
-        StartCoroutine(m_Levels[currLevel].setupLevel(done));
-        yield return new WaitUntil(() => done[0]);
+        yield return StartCoroutine(m_Levels[currLevel].setupLevel());
         StartLevel(currLevel);
     }
 
@@ -81,21 +79,28 @@ public class GameController : MonoBehaviour
     public IEnumerator ascendFloor()
     {
         currLevel++; instrLv++;
-        geometrySpawn.spawnNewFloor(currLevel);
-        bool[] done = new bool[1];
-        StartCoroutine(m_Levels[currLevel].setupLevel(done));
-        yield return new WaitUntil(() => done[0]);
-        Debug.Log("setup Level truly done");
+
+        yield return StartCoroutine(geometrySpawn.spawnNewFloor(currLevel));
+    }
+
+    public void setUpCurrLevel()
+    {
+        StartCoroutine(setupCurrLvIE());
+    }
+
+    private IEnumerator setupCurrLvIE()
+    {
+        yield return StartCoroutine(m_Levels[currLevel].setupLevel());
         StartLevel(currLevel);
     }
 
-    public void CorrectCamera()
+    public IEnumerator CorrectCamera()
     {
         
         Vector3 diff = geometrySpawn.getCameraLookat(currLevel, playerStartPosOffset) - m_Camera.transform.position;
         diff.z = 0;
-        Debug.Log("correct camera " + m_Camera.transform.position + diff);
-        StartCoroutine(Global.moveToInSecs(m_Camera.gameObject, m_Camera.transform.position + diff, 1, new bool[1]));
+        //Debug.Log("correct camera " + m_Camera.transform.position + diff);
+        yield return StartCoroutine(Global.moveToInSecs(m_Camera.gameObject, m_Camera.transform.position + diff, 1));
     }
     void StartLevel(int a_Index)
     {
@@ -105,7 +110,7 @@ public class GameController : MonoBehaviour
         }
 
         currLevel = a_Index;
-        CorrectCamera();
+        StartCoroutine(CorrectCamera());
         if (OnLevelStart != null)
         {
             OnLevelStart();

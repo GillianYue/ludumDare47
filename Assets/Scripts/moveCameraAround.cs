@@ -26,6 +26,6 @@ public class moveCameraAround : MonoBehaviour
         if (dest.x <= xMin) dest = new Vector3(xMin, dest.y, dest.z);
         else if (dest.x >= xMax) dest = new Vector3(xMax, dest.y, dest.z);
 
-        StartCoroutine(Global.moveToInSecs(cam, dest, 0.5f, new bool[1]));
+        StartCoroutine(Global.moveToInSecs(cam, dest, 0.5f));
     }
 }

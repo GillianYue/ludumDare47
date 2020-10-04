@@ -72,9 +72,9 @@ public class GeometrySpawner : MonoBehaviour
         return new Vector3(startOrigin.x + gameController.playerStartPosOffset.x, startOrigin.y + gameController.currLevel * dy + gameController.playerStartPosOffset.y, 0);
     }
 
-    public void spawnNewFloor(int floorIndex)
+    public IEnumerator spawnNewFloor(int floorIndex)
     {
-        if (floorType[floorIndex] == -1) return;
+        if (floorType[floorIndex] == -1) yield return null;
 
         Material floorMat = floorMaterials[floorType[floorIndex]];
         GameObject f = Instantiate(floorPrefab, geometryHolder.transform);
@@ -83,7 +83,8 @@ public class GeometrySpawner : MonoBehaviour
         f.transform.position = startOrigin + new Vector3(0, floorIndex * dy, 0);
         currFloor = f;
 
-        gameController.CorrectCamera();
+        yield return StartCoroutine(gameController.CorrectCamera());
+        gameController.setUpCurrLevel();
     }
 
     public void spawnStone(stoneBehavior[] stones, int index, InSceneLevel.levelType type, Vector3 deltaPosition, Vector3 rotation, int note)
@@ -152,9 +153,7 @@ public class GeometrySpawner : MonoBehaviour
 
             if (mouseDrag) currSpawnedStone = go;
 
-        bool[] don = new bool[1];
-        StartCoroutine(Global.moveToInSecs(go, spawnPos, 0.5f, don));
-        yield return new WaitUntil(() => don[0]);
+            yield return StartCoroutine(Global.moveToInSecs(go, spawnPos, 0.5f));
         }
         else
         { //space, generate hint highlight prefab
