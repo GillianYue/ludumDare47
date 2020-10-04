@@ -52,7 +52,7 @@ public class GameController : MonoBehaviour
         return m_Levels[currLevel];
     }
 
-    void OnGUI()
+/*    void OnGUI()
     {
         for (int i = 0; i < m_Levels.Length; i++)
         {
@@ -67,7 +67,7 @@ public class GameController : MonoBehaviour
                 StartLevel(index);
             }
         }
-    }
+    }*/
 
     void Update()
     {

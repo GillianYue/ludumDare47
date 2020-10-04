@@ -12,7 +12,7 @@ public class GeometrySpawner : MonoBehaviour
     public int[] floorType; //stores the material index of this floor
 
     public GameObject[] padCrystals, bassStones, drumCubes;
-    public int[] crystalOffsetY, stoneOffsetY, cubeOffsetY; //int[7]s that indicate y offset for different notes - 0 for do, etc. 
+    public int[] notesOffsetY; //int[7]s that indicate y offset for different notes - 0 for do, etc. 
     public GameController gameController;
     public Camera cam;
 
@@ -122,16 +122,16 @@ public class GeometrySpawner : MonoBehaviour
             switch (type)
             {
                 case InSceneLevel.levelType.DRUM:
-                    if(note != -1) spawnPos += new Vector3(0, cubeOffsetY[note], 0);
+                    if(note != -1) spawnPos += new Vector3(0, notesOffsetY[note], 0);
                     go = Instantiate(drumCubes[Random.Range(0, drumCubes.Length)], spawnPos + deltaUp, Quaternion.Euler(rotation));
                     break;
                 case InSceneLevel.levelType.PAD:
-                    if (note != -1) spawnPos += new Vector3(0, crystalOffsetY[note], 0);
+                    if (note != -1) spawnPos += new Vector3(0, notesOffsetY[note], 0);
                     go = Instantiate(padCrystals[Random.Range(0, padCrystals.Length)], spawnPos + deltaUp, Quaternion.Euler(rotation));
 
                     break;
                 case InSceneLevel.levelType.BASS:
-                    if (note != -1) spawnPos += new Vector3(0, stoneOffsetY[note], 0);
+                    if (note != -1) spawnPos += new Vector3(0, notesOffsetY[note], 0);
                     go = Instantiate(bassStones[Random.Range(0, bassStones.Length)], spawnPos + deltaUp, Quaternion.Euler(rotation));
                     break;
             }

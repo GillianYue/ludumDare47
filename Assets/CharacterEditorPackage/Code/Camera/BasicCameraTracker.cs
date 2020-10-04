@@ -34,4 +34,7 @@ public class BasicCameraTracker : MonoBehaviour {
         Vector3 diff = m_Target.transform.position + Vector3.back * m_ZDistance - transform.position;
         transform.position += diff * m_InterpolationFactor * a_DeltaTime;
     }
+
+
+
 }

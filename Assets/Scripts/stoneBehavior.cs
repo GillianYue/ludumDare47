@@ -30,7 +30,7 @@ public class stoneBehavior : MonoBehaviour
         else transform.position = intersectingSpace.transform.position;
         index = intersectingSpace.index;
         intersectingSpace.gameObject.SetActive(false);
-        myLevel.setStoneAssignment(index, 1); //TODO
+        myLevel.setStoneAssignment(index, 1, transform); 
         return true;
     }
 

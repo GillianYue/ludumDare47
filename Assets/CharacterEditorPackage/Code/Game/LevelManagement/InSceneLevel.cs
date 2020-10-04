@@ -69,11 +69,14 @@ public class InSceneLevel : MonoBehaviour {
         StartCoroutine(Global.moveToInSecs(cam, dest, moveTime, new bool[1]));
     }
 
-    public void setStoneAssignment(int spot, int assignment)
+    public void setStoneAssignment(int spot, int assignment, Transform stoneTransform)
     {
         currAssignment[spot] = assignment;
         checkForSingleStone(spot); //see if this assignment is "correct"
         //TODO reassign height based on assignment note
+
+        Vector3 delta = new Vector3(0, geometrySpawner.notesOffsetY[assignment], 0);
+        stoneTransform.position = stoneTransform.position + delta;
     }
 
     public bool checkForLevelPass()

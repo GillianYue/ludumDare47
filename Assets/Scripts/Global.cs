@@ -24,4 +24,34 @@ public class Global : MonoBehaviour
     {
         return moveToInSecs(e, (int)dest.x, (int)dest.y, sec, done);
     }
+
+    public static void rotateAnim(GameObject e, MonoBehaviour m) { m.StartCoroutine(rotateAnimIE(e));  }
+    public static void horizShakeAnim(GameObject e, MonoBehaviour m) { m.StartCoroutine(horizShakeAnimIE(e));  }
+
+    private static IEnumerator rotateAnimIE(GameObject e)
+    {
+        Transform t = e.transform;
+        Vector3 origRotation = t.rotation.eulerAngles;
+
+
+        for (int l = 0; l < 2; l++)
+        {
+            t.rotation = Quaternion.Euler(origRotation + new Vector3(0, 0, 10));
+            yield return new WaitForSeconds(0.2f);
+            t.rotation = Quaternion.Euler(origRotation);
+        }
+    }
+
+    private static IEnumerator horizShakeAnimIE(GameObject e)
+    {
+        Transform t = e.transform;
+        Vector3 origPosition = t.position;
+
+        for (int l = 0; l < 2; l++)
+        {
+            t.position += new Vector3(20, 0, 0);
+            yield return new WaitForSeconds(0.2f);
+            t.position = origPosition;
+        }
+    }
 }
