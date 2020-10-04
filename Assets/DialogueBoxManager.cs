@@ -8,7 +8,6 @@ public class DialogueBoxManager : MonoBehaviour
     public void Initalize(string text, bool god)
     {
         GetComponentInChildren<DialoguePlacer>().Initalize(text, god);
-        Debug.Log(god);
         if(god == true)
         {
             transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = "God";
@@ -16,7 +15,6 @@ public class DialogueBoxManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("what?");
             transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = "Spirit";
             transform.GetChild(1).GetComponent<Image>().color = Color.blue;
         }
