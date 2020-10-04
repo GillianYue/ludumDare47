@@ -14,6 +14,7 @@ public class GameController : MonoBehaviour
 
     static GameController g_gameController;
     public int currentBeat; public Text beatText;
+    public Animator beatAnimator;
     public static GameController Get()
     {
         if (g_gameController == null)
@@ -78,7 +79,7 @@ public class GameController : MonoBehaviour
 
     public IEnumerator ascendFloor()
     {
-        currLevel++;
+        currLevel++; instrLv++;
         geometrySpawn.spawnNewFloor(currLevel);
         bool[] done = new bool[1];
         StartCoroutine(m_Levels[currLevel].setupLevel(done));
@@ -107,21 +108,21 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public void playCurrentLoop()
+    public IEnumerator playCurrentLoop()
     {
-        for (int i = 0; i<=instrLv; i++)
+        if (instrLv > 1)
         {
-            
-            instruments[i].Play();
+            //yield return new WaitForSeconds(0.001f);
+            yield return new WaitUntil(() => currentBeat == 0);
+            StopAllCoroutines();
         }
+            for (int i = 0; i <= instrLv; i++)
+            {
 
-        StartCoroutine(beatCounter());
-    }
+                instruments[i].Play();
+            }
 
-    public IEnumerator startBeatCounterAfterFirstLoop()
-    {
-        yield return new WaitForSeconds(6.4f);
-        StartCoroutine(beatCounter());
+            StartCoroutine(beatCounter());
     }
 
     public IEnumerator beatCounter()
@@ -131,6 +132,7 @@ public class GameController : MonoBehaviour
         while (true) {
 
             currentBeat += 1;
+            beatAnimator.SetTrigger("a");
             if (count > 16) m_Levels[currLevel].currentBeatStoneAnim(currentBeat-1);
             yield return new WaitForSeconds(0.4f);
 

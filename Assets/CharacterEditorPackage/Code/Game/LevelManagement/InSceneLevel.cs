@@ -51,7 +51,7 @@ public class InSceneLevel : MonoBehaviour {
     private IEnumerator putPuzzlesInPlace(bool[] inPlace)
     {
         yield return new WaitForSeconds(0.5f);
-        geometrySpawner.gameController.playCurrentLoop();
+        StartCoroutine(geometrySpawner.gameController.playCurrentLoop());
 
         Vector3 startDelta = geometrySpawner.getStartOrigin() + new Vector3(startDistance, 0, 0); //we only need the x here
 
@@ -100,6 +100,7 @@ public class InSceneLevel : MonoBehaviour {
         }
 
         geometrySpawner.correctNumberText.text = correctCount.ToString() + "/16";
+        if (correctCount == 16) StartCoroutine(geometrySpawner.gameController.ascendFloor());
         return (correctCount == 16);
     }
 
