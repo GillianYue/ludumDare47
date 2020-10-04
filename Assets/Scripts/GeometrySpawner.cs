@@ -180,7 +180,7 @@ public class GeometrySpawner : MonoBehaviour
         go.transform.parent = currFloor.transform;
 
         stoneBehavior s = go.GetComponent<stoneBehavior>();
-        stones[index] = s;
+        if(stones[index] && s) stones[index] = s;
         s.index = index; s.myLevel = gameController.getCurrLevel(); s.note = 0;
 
         return go;

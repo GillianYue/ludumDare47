@@ -15,6 +15,7 @@ public class GameController : MonoBehaviour
     static GameController g_gameController;
     public int currentBeat; public Text beatText;
     public Animator beatAnimator;
+    private IEnumerator currentBeatCount;
     public static GameController Get()
     {
         if (g_gameController == null)
@@ -84,13 +85,16 @@ public class GameController : MonoBehaviour
         bool[] done = new bool[1];
         StartCoroutine(m_Levels[currLevel].setupLevel(done));
         yield return new WaitUntil(() => done[0]);
+        Debug.Log("setup Level truly done");
         StartLevel(currLevel);
     }
 
     public void CorrectCamera()
     {
+        
         Vector3 diff = geometrySpawn.getCameraLookat(currLevel, playerStartPosOffset) - m_Camera.transform.position;
         diff.z = 0;
+        Debug.Log("correct camera " + m_Camera.transform.position + diff);
         StartCoroutine(Global.moveToInSecs(m_Camera.gameObject, m_Camera.transform.position + diff, 1, new bool[1]));
     }
     void StartLevel(int a_Index)
@@ -112,9 +116,8 @@ public class GameController : MonoBehaviour
     {
         if (instrLv > 1)
         {
-            //yield return new WaitForSeconds(0.001f);
-            yield return new WaitUntil(() => currentBeat == 0);
-            StopAllCoroutines();
+            yield return new WaitForSeconds(0.001f);
+            StopCoroutine(currentBeatCount);
         }
             for (int i = 0; i <= instrLv; i++)
             {
@@ -122,23 +125,24 @@ public class GameController : MonoBehaviour
                 instruments[i].Play();
             }
 
-            StartCoroutine(beatCounter());
+            currentBeatCount = beatCounter();
+            StartCoroutine(currentBeatCount);
     }
 
     public IEnumerator beatCounter()
     {
-        currentBeat = 0; int count = 0;
+        currentBeat = 0; int count = 0; float startTime = Time.time;
 
         while (true) {
 
-            currentBeat += 1;
+            currentBeat += 1; count++;
             beatAnimator.SetTrigger("a");
             if (count > 16) m_Levels[currLevel].currentBeatStoneAnim(currentBeat-1);
-            yield return new WaitForSeconds(0.4f);
+            yield return new WaitUntil(() => (Time.time >= startTime + count * 0.4f));
 
 
             if (currentBeat == 16) currentBeat = 0;
-            count ++;
+            
                 }
     }
 }

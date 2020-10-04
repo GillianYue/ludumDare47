@@ -40,12 +40,15 @@ public class InSceneLevel : MonoBehaviour {
 
     public IEnumerator setupLevel(bool[] done)
     {
+        Debug.Log("setting up level " + name);
         bool[] inPlace = new bool[1];
         StartCoroutine(putPuzzlesInPlace(inPlace));
 
         yield return new WaitUntil(() => inPlace[0]);
         checkForLevelPass();
+        Debug.Log("check for level pass done");
         done[0] = true;
+        Debug.Log("done");
     }
 
     private IEnumerator putPuzzlesInPlace(bool[] inPlace)
@@ -90,18 +93,21 @@ public class InSceneLevel : MonoBehaviour {
         }
     }
 
-    public bool checkForLevelPass()
+    public void checkForLevelPass()
     {
         int correctCount = 0;
         for(int a = 0; a<16; a++)
         {
             if (currAssignment[a] == puzzle[a]) correctCount++;
-            //else Debug.Log("mismatch at " + a + ": curr " + currAssignment[1] + " and puzzle " + puzzle[a]);
+            else Debug.Log("mismatch at " + a + ": curr " + currAssignment[1] + " and puzzle " + puzzle[a]);
         }
 
         geometrySpawner.correctNumberText.text = correctCount.ToString() + "/16";
-        if (correctCount == 16) StartCoroutine(geometrySpawner.gameController.ascendFloor());
-        return (correctCount == 16);
+        if (correctCount == 16)
+        {
+            StartCoroutine(geometrySpawner.gameController.ascendFloor());
+            gameObject.SetActive(false);
+        }
     }
 
     public bool checkForSingleStone(int index)
@@ -123,6 +129,6 @@ public class InSceneLevel : MonoBehaviour {
 
     public void currentBeatStoneAnim(int index)
     {
-        stones[index].beatAnim();
+     if(stones[index])   stones[index].beatAnim();
     }
 }

@@ -7,6 +7,7 @@ public class Global : MonoBehaviour
 
     public static IEnumerator moveToInSecs(GameObject e, int x, int y, float sec, bool[] done)
     {
+        Debug.Log("moving something");
         float xDist = x - e.transform.position.x;
         float yDist = y - e.transform.position.y;
         float dx = xDist / sec;
