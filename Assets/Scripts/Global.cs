@@ -36,8 +36,8 @@ public class Global : MonoBehaviour
 
         for (int l = 0; l < 2; l++)
         {
-            t.rotation = Quaternion.Euler(origRotation + new Vector3(0, 0, 10));
-            yield return new WaitForSeconds(0.2f);
+            t.rotation = Quaternion.Euler(origRotation + new Vector3(0, 0, -5));
+            yield return new WaitForSeconds(0.03f);
             t.rotation = Quaternion.Euler(origRotation);
         }
     }
@@ -50,8 +50,16 @@ public class Global : MonoBehaviour
         for (int l = 0; l < 2; l++)
         {
             t.position += new Vector3(20, 0, 0);
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.03f);
             t.position = origPosition;
         }
+    }
+
+    public static IEnumerator brieflyChangeColor(Color orig, Color newCol, SpriteRenderer s, float waitTime)
+    {
+        s.color = newCol;
+        yield return new WaitForSeconds(waitTime);
+
+        s.color = orig;
     }
 }

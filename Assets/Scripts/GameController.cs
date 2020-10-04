@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class GameController : MonoBehaviour
@@ -12,6 +13,7 @@ public class GameController : MonoBehaviour
     [SerializeField] int m_ButtonsPerRow = 0;
 
     static GameController g_gameController;
+    public int currentBeat; public Text beatText;
     public static GameController Get()
     {
         if (g_gameController == null)
@@ -27,8 +29,9 @@ public class GameController : MonoBehaviour
 
     [SerializeField] public Transform m_Camera = null;
     public GeometrySpawner geometrySpawn;
-    public int currLevel, SkillLv; //instrumentLv indicates how many instruments have been unlocked
+    public int currLevel, instrLv; //instrumentLv indicates how many instruments have been unlocked
     [HideInInspector] public Vector3 playerStartPosOffset; //offset between player view (camera) spawn pos for each level and the floor spawn pos
+    public AudioSource[] instruments;
 
     //indices for instruments: 
 
@@ -52,29 +55,14 @@ public class GameController : MonoBehaviour
         return m_Levels[currLevel];
     }
 
-/*    void OnGUI()
-    {
-        for (int i = 0; i < m_Levels.Length; i++)
-        {
-            int xIndex = (i) % (m_ButtonsPerRow);
-            int yIndex = i / m_ButtonsPerRow;
-            int xPos = Screen.width - m_ButtonsPerRow * m_ButtonSize + (xIndex) * m_ButtonSize;
-            int yPos = yIndex * m_ButtonSize;
-
-            int index = i;
-            if (GUI.Button(new Rect(xPos, yPos, m_ButtonSize, m_ButtonSize), (index + 1).ToString()))
-            {
-                StartLevel(index);
-            }
-        }
-    }*/
-
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Return))
         {
             StartCoroutine(ascendFloor());
         }
+
+        beatText.text = currentBeat.ToString();
     }
 
     public void SetIndex(int a_Index)
@@ -117,5 +105,38 @@ public class GameController : MonoBehaviour
         {
             OnLevelStart();
         }
+    }
+
+    public void playCurrentLoop()
+    {
+        for (int i = 0; i<=instrLv; i++)
+        {
+            
+            instruments[i].Play();
+        }
+
+        StartCoroutine(beatCounter());
+    }
+
+    public IEnumerator startBeatCounterAfterFirstLoop()
+    {
+        yield return new WaitForSeconds(6.4f);
+        StartCoroutine(beatCounter());
+    }
+
+    public IEnumerator beatCounter()
+    {
+        currentBeat = 0; int count = 0;
+
+        while (true) {
+
+            currentBeat += 1;
+            if (count > 16) m_Levels[currLevel].currentBeatStoneAnim(currentBeat-1);
+            yield return new WaitForSeconds(0.4f);
+
+
+            if (currentBeat == 16) currentBeat = 0;
+            count ++;
+                }
     }
 }

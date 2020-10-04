@@ -7,7 +7,7 @@ public class stoneBehavior : MonoBehaviour
     public InSceneLevel myLevel;
     public SpriteRenderer mySprite;
     private float originalOpacity;
-    public int index = -1; //by default, NA
+    public int index = -1, note; //by default, NA
 
     public stoneBehavior intersectingSpace;
 
@@ -20,7 +20,7 @@ public class stoneBehavior : MonoBehaviour
 
     void Update()
     {
-        
+
     }
 
     public bool checkAssign()
@@ -29,8 +29,9 @@ public class stoneBehavior : MonoBehaviour
         if (intersectingSpace == null) return false;
         else transform.position = intersectingSpace.transform.position;
         index = intersectingSpace.index;
+        note = myLevel.defaultGenerateNote;
         intersectingSpace.gameObject.SetActive(false);
-        myLevel.setStoneAssignment(index, 1, transform); 
+        myLevel.setStoneAssignment(index, note, transform); //will also check for level pass
         return true;
     }
 
@@ -38,7 +39,7 @@ public class stoneBehavior : MonoBehaviour
     {
         if (myLevel)
         {
-            if(tag.Equals("Space") && other.tag.Equals("Stone"))
+            if (tag.Equals("Space") && other.tag.Equals("Stone"))
             {
             }
             if (tag.Equals("Space") && other.tag.Equals("Stone") && myLevel.canModifyStone(index))
@@ -71,4 +72,40 @@ public class stoneBehavior : MonoBehaviour
             }
         }
     }
+
+    public void beatAnim()
+    {
+        if (tag.Equals("Stone"))
+        {
+            Global.rotateAnim(gameObject, this);
+        }
+        else if (tag.Equals("Space"))
+        {
+            StartCoroutine(Global.brieflyChangeColor(mySprite.color, new Color(250, 130, 0, mySprite.color.a), mySprite, 0.4f));
+        }
+    }
+
+    void OnMouseEnter()
+    {
+        if (myLevel)
+        {
+            myLevel.geometrySpawner.currMouseOver = this;
+        }
+    }
+
+    void OnMouseExit()
+    {
+        if (myLevel && myLevel.geometrySpawner.currMouseOver &&
+            myLevel.geometrySpawner.currMouseOver.Equals(this)) myLevel.geometrySpawner.currMouseOver = null;
+    }
+
+    public void removeThisStone()
+    {
+        Vector3 startDelta = myLevel.geometrySpawner.getStartOrigin() + new Vector3(myLevel.startDistance, 0, 0); //we only need the x here
+
+        myLevel.geometrySpawner.spawnHighlightAt(myLevel.stones, index, new Vector3(startDelta.x + index * myLevel.dx + Random.Range(0, myLevel.dxNoise), 0, 0));
+        myLevel.setStoneAssignment(index, 0, null);
+        Destroy(gameObject);
+    }
+
 }

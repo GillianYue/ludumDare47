@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GeometrySpawner : MonoBehaviour
 {
@@ -17,6 +18,10 @@ public class GeometrySpawner : MonoBehaviour
     public Camera cam;
 
     public GameObject geometryHolder, currSpawnedStone;
+    public stoneBehavior currMouseOver;
+    public Text correctNumberText;
+
+    public AudioSource placeCorrectSFX;
 
 
     void Start()
@@ -39,6 +44,11 @@ public class GeometrySpawner : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             mouseClick();
+        }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            mouseRightClick();
         }
     }
 
@@ -76,9 +86,9 @@ public class GeometrySpawner : MonoBehaviour
         gameController.CorrectCamera();
     }
 
-    public void spawnStone(int index, InSceneLevel.levelType type, Vector3 deltaPosition, Vector3 rotation, int note)
+    public void spawnStone(stoneBehavior[] stones, int index, InSceneLevel.levelType type, Vector3 deltaPosition, Vector3 rotation, int note)
     {
-        StartCoroutine(spawnStoneCoroutine(index, type, deltaPosition, rotation, note, false));
+        StartCoroutine(spawnStoneCoroutine(stones, index, type, deltaPosition, rotation, note, false));
     }
 
     public void spawnStoneMouse()
@@ -105,13 +115,15 @@ public class GeometrySpawner : MonoBehaviour
                 break;
         }
 
+        go.transform.parent = currFloor.transform;
+
         stoneBehavior s = go.GetComponent<stoneBehavior>();
         s.myLevel = gameController.getCurrLevel();
         currSpawnedStone = go;
     }
 
 
-    private IEnumerator spawnStoneCoroutine(int index, InSceneLevel.levelType type, Vector3 deltaPosition, Vector3 rotation, int note, bool mouseDrag)
+    private IEnumerator spawnStoneCoroutine(stoneBehavior[] stones, int index, InSceneLevel.levelType type, Vector3 deltaPosition, Vector3 rotation, int note, bool mouseDrag)
     {
         Vector3 floorOrigin = startOrigin + new Vector3(0, gameController.currLevel * dy, 0), //starting point
             spawnPos = floorOrigin + deltaPosition, deltaUp = new Vector3(0, 40, 0);
@@ -137,7 +149,7 @@ public class GeometrySpawner : MonoBehaviour
             }
 
             go.transform.parent = currFloor.transform;
-           
+
             if (mouseDrag) currSpawnedStone = go;
 
         bool[] don = new bool[1];
@@ -148,11 +160,30 @@ public class GeometrySpawner : MonoBehaviour
         { //space, generate hint highlight prefab
             go = Instantiate(highlightPrefab, spawnPos, Quaternion.Euler(0,0,0));
             go.transform.parent = currFloor.transform;
+            SpriteRenderer spr = go.transform.GetChild(0).GetComponent<SpriteRenderer>();
+
+            StartCoroutine(Global.brieflyChangeColor(spr.color, new Color(250, 130, 0, spr.color.a), spr, 0.4f));
         }
 
+        stoneBehavior s = go.GetComponent<stoneBehavior>();
+        stones[index] = s;
+        s.index = index; s.myLevel = gameController.getCurrLevel(); s.note = note;
+    }
+
+    public GameObject spawnHighlightAt(stoneBehavior[] stones, int index, Vector3 deltaPosition)
+    {
+        Vector3 floorOrigin = startOrigin + new Vector3(0, gameController.currLevel * dy, 0), //starting point
+            spawnPos = floorOrigin + deltaPosition;
+
+        GameObject go;
+        go = Instantiate(highlightPrefab, spawnPos, Quaternion.Euler(0, 0, 0));
+        go.transform.parent = currFloor.transform;
 
         stoneBehavior s = go.GetComponent<stoneBehavior>();
-        s.index = index; s.myLevel = gameController.getCurrLevel();
+        stones[index] = s;
+        s.index = index; s.myLevel = gameController.getCurrLevel(); s.note = 0;
+
+        return go;
     }
 
     void mouseClick()
@@ -168,6 +199,21 @@ public class GeometrySpawner : MonoBehaviour
                 Destroy(currSpawnedStone);
                 currSpawnedStone = null;
             }
+        }
+    }
+
+
+    void mouseRightClick()
+    {
+        if (currSpawnedStone != null)
+        {
+            Destroy(currSpawnedStone);
+            currSpawnedStone = null;
+        }
+
+        if(currMouseOver != null)
+        {
+            currMouseOver.removeThisStone();
         }
     }
 }

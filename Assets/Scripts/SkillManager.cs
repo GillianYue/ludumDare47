@@ -19,17 +19,17 @@ public class SkillManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.D))
+/*        if (Input.GetKeyDown(KeyCode.D))
         {
             nextSkill();
         }
         if (Input.GetKeyDown(KeyCode.A))
         {
             previousSkill();
-        }
+        }*/
     }
 
-    public void nextSkill()
+/*    public void nextSkill()
     {
         Debug.Log("in next: " + currSkillIndex);
         if (currSkillIndex == gameControl.SkillLv)
@@ -60,6 +60,13 @@ public class SkillManager : MonoBehaviour
         if (gameControl.SkillLv < index) return;
 
         //TODO livelier transition
+        SkillIcons[currSkillIndex].SetActive(false);
+        SkillIcons[index].SetActive(true);
+        currSkillIndex = index;
+    }*/
+
+    public void updateInstrumentIcon(int index)
+    {
         SkillIcons[currSkillIndex].SetActive(false);
         SkillIcons[index].SetActive(true);
         currSkillIndex = index;
