@@ -29,7 +29,7 @@ public class DialoguePlacer : MonoBehaviour
     }
 
 
-    private void FadeCharacter(char character)
+    private IEnumerator FadeCharacter(char character)
     {
         Color originalColor = textDisplay.color;
         string grexText;
@@ -40,6 +40,7 @@ public class DialoguePlacer : MonoBehaviour
             Color color = Color.Lerp(Color.clear, originalColor, Mathf.Min(1, t / fadeInTime));
             grexText = "<color=#" + ColorUtility.ToHtmlStringRGBA(color) + ">" + character + "</color>";
             textDisplay.text = textDisplay.text + grexText;
+            yield return null;
         }
         textDisplay.text = currentText;
         textDisplay.text = textDisplay.text + character;
@@ -50,7 +51,7 @@ public class DialoguePlacer : MonoBehaviour
         for (int i = 0; i < lengthOfText; i++)
         {
             yield return new WaitForSeconds(.1f);
-            FadeCharacter(textToDisplay[i]);
+            StartCoroutine(FadeCharacter(textToDisplay[i]));
         }
         yield return new WaitForSeconds(textToDisplay.Length * .01f);
         StartCoroutine(RemoveText());

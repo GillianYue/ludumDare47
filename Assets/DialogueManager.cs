@@ -29,13 +29,13 @@ public class DialogueManager : MonoBehaviour
     private void CreateNewMessage(string text, bool god)
     {
         GameObject display =  Instantiate(_DisplayPrefab, transform.position, Quaternion.identity, transform);
-        display.transform.GetChild(0).GetComponent<DialoguePlacer>().Initalize(text, god);
+        display.GetComponent<DialogueBoxManager>().Initalize(text, god);
     }
 
 
     void Start()
     {
-        CreateNewMessage("I command you to go here!", true);
+        StartNewDialogue("move there", true);
     }
 
     public void StartNewDialogue(string key, bool god)
@@ -44,7 +44,7 @@ public class DialogueManager : MonoBehaviour
         {
             if(godLines.ContainsKey(key))
             {
-                CreateNewMessage(godLines[key], !god);
+                CreateNewMessage(godLines[key], god);
             }
         }
 
@@ -52,7 +52,7 @@ public class DialogueManager : MonoBehaviour
         {
             if (npcLines.ContainsKey(key) == true)
             {
-                CreateNewMessage(npcLines[key], !god);
+                CreateNewMessage(npcLines[key], god);
             }
         }
     }
