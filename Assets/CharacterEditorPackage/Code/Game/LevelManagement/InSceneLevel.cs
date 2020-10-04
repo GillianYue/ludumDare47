@@ -9,8 +9,9 @@ public class InSceneLevel : MonoBehaviour {
     public enum levelType { DRUM, PAD, BASS, GUITAR };
     public levelType type;
 
-    public string puzzleSource;
-    private int[] puzzle;
+    public string puzzleSource, puzzleSpawnSource;
+    private int[] puzzle, puzzleSpawnAssignment; //spawn assignment is data on what stuff should be spawned on start of the level
+    public int[] currAssignment;
     public int dx, dxNoise, startDistance;
 
     public float stoneSpawnDeltaTime;
@@ -21,11 +22,13 @@ public class InSceneLevel : MonoBehaviour {
     void Start()
     {
         puzzle = new int[puzzleSource.Length];
+        puzzleSpawnAssignment = new int[puzzleSpawnSource.Length];
 
         char[] ca = puzzleSource.ToCharArray();
         for (int c = 0; c<puzzleSource.Length; c++)
         {
             int.TryParse(puzzleSource.Substring(c, 1), out puzzle[c]);
+            int.TryParse(puzzleSpawnSource.Substring(c, 1), out puzzleSpawnAssignment[c]);
         }
 
     }
@@ -50,9 +53,11 @@ public class InSceneLevel : MonoBehaviour {
         for(int a=0; a<16; a++)
         {
             Vector3 currXDelta = new Vector3(startDelta.x + a * dx + Random.Range(0, dxNoise), 0, 0);
-            geometrySpawner.spawnStone(type, currXDelta, type!= levelType.BASS? new Vector3(0, 0, Random.Range(-30, 30)) : Vector3.zero, puzzle[a]);
+            geometrySpawner.spawnStone(a, type, currXDelta, type!= levelType.BASS? new Vector3(0, 0, Random.Range(-geometrySpawner.angleNoise, geometrySpawner.angleNoise)) : 
+                Vector3.zero, puzzleSpawnAssignment[a]);
             yield return new WaitForSeconds(stoneSpawnDeltaTime);
         }
+        currAssignment = puzzleSpawnAssignment;
 
         yield return new WaitForSeconds(1.5f);
         inPlace[0] = true;
@@ -62,6 +67,39 @@ public class InSceneLevel : MonoBehaviour {
     {
         yield return new WaitForSeconds(sec);
         StartCoroutine(Global.moveToInSecs(cam, dest, moveTime, new bool[1]));
+    }
+
+    public void setStoneAssignment(int spot, int assignment)
+    {
+        currAssignment[spot] = assignment;
+        checkForSingleStone(spot); //see if this assignment is "correct"
+        //TODO reassign height based on assignment note
+    }
+
+    public bool checkForLevelPass()
+    {
+        for(int a = 0; a<16; a++)
+        {
+            if (currAssignment[a] != puzzle[a]) return false;
+        }
+
+        return true;
+    }
+
+    public bool checkForSingleStone(int index)
+    {
+        if (currAssignment[index] == puzzle[index])
+        {
+            //vfx TODO
+            puzzleSpawnAssignment[index] = 0; //can no longer modify this stone
+            return true;
+        }
+        else return false;
+    }
+
+    public bool canModifyStone(int index)
+    {
+        return (puzzleSpawnAssignment[index] == 0);
     }
 
 }

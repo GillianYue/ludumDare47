@@ -8,14 +8,16 @@ public class GeometrySpawner : MonoBehaviour
     public GameObject floorPrefab, highlightPrefab;
     public Material[] floorMaterials;
     private Vector3 startOrigin; //floors will be spawned based on this position + dy * levelNum
-    public float dy; //height of each floor; increment difference in height
+    public float dy, angleNoise; //height of each floor; increment difference in height
     public int[] floorType; //stores the material index of this floor
 
     public GameObject[] padCrystals, bassStones, drumCubes;
     public int[] crystalOffsetY, stoneOffsetY, cubeOffsetY; //int[7]s that indicate y offset for different notes - 0 for do, etc. 
     public GameController gameController;
+    public Camera cam;
 
-    public GameObject geometryHolder;
+    public GameObject geometryHolder, currSpawnedStone;
+
 
     void Start()
     {
@@ -23,12 +25,21 @@ public class GeometrySpawner : MonoBehaviour
 /*        dy = Mathf.Abs(secondFloor.transform.position.y - startFloor.transform.position.y);
         Debug.Log("dy is " + dy);*/
         currFloor = startFloor;
+        cam = gameController.m_Camera.GetComponent<Camera>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        if (currSpawnedStone != null)
+        {
+            Vector3 pos = cam.ScreenToWorldPoint(Input.mousePosition);
+            currSpawnedStone.transform.position = new Vector3(pos.x, pos.y, 0);
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            mouseClick();
+        }
     }
 
     public Transform getCameraTransform()
@@ -65,13 +76,42 @@ public class GeometrySpawner : MonoBehaviour
         gameController.CorrectCamera();
     }
 
-    public void spawnStone(InSceneLevel.levelType type, Vector3 deltaPosition, Vector3 rotation, int note)
+    public void spawnStone(int index, InSceneLevel.levelType type, Vector3 deltaPosition, Vector3 rotation, int note)
     {
-        StartCoroutine(spawnStoneCoroutine(type, deltaPosition, rotation, note));
+        StartCoroutine(spawnStoneCoroutine(index, type, deltaPosition, rotation, note, false));
+    }
+
+    public void spawnStoneMouse()
+    {
+        if (currSpawnedStone != null) Destroy(currSpawnedStone);
+        InSceneLevel.levelType t = gameController.getCurrLevel().type;
+        Vector3 pos = cam.ScreenToWorldPoint(Input.mousePosition);
+        GameObject go = null;
+
+        switch (t)
+        {
+            case InSceneLevel.levelType.DRUM:
+                go = Instantiate(drumCubes[Random.Range(0, drumCubes.Length)], pos, 
+                    Quaternion.Euler(t != InSceneLevel.levelType.BASS ? new Vector3(0, 0, Random.Range(-angleNoise, angleNoise)) : Vector3.zero));
+                break;
+            case InSceneLevel.levelType.PAD:
+                go = Instantiate(padCrystals[Random.Range(0, padCrystals.Length)], pos, 
+                    Quaternion.Euler(t != InSceneLevel.levelType.BASS ? new Vector3(0, 0, Random.Range(-angleNoise, angleNoise)) : Vector3.zero));
+
+                break;
+            case InSceneLevel.levelType.BASS:
+                go = Instantiate(bassStones[Random.Range(0, bassStones.Length)], pos, 
+                    Quaternion.Euler(t != InSceneLevel.levelType.BASS ? new Vector3(0, 0, Random.Range(-angleNoise, angleNoise)) : Vector3.zero));
+                break;
+        }
+
+        stoneBehavior s = go.GetComponent<stoneBehavior>();
+        s.myLevel = gameController.getCurrLevel();
+        currSpawnedStone = go;
     }
 
 
-        private IEnumerator spawnStoneCoroutine(InSceneLevel.levelType type, Vector3 deltaPosition, Vector3 rotation, int note)
+    private IEnumerator spawnStoneCoroutine(int index, InSceneLevel.levelType type, Vector3 deltaPosition, Vector3 rotation, int note, bool mouseDrag)
     {
         Vector3 floorOrigin = startOrigin + new Vector3(0, gameController.currLevel * dy, 0), //starting point
             spawnPos = floorOrigin + deltaPosition, deltaUp = new Vector3(0, 40, 0);
@@ -82,22 +122,23 @@ public class GeometrySpawner : MonoBehaviour
             switch (type)
             {
                 case InSceneLevel.levelType.DRUM:
-                    spawnPos += new Vector3(0, cubeOffsetY[note], 0);
+                    if(note != -1) spawnPos += new Vector3(0, cubeOffsetY[note], 0);
                     go = Instantiate(drumCubes[Random.Range(0, drumCubes.Length)], spawnPos + deltaUp, Quaternion.Euler(rotation));
                     break;
                 case InSceneLevel.levelType.PAD:
-                    spawnPos += new Vector3(0, crystalOffsetY[note], 0);
+                    if (note != -1) spawnPos += new Vector3(0, crystalOffsetY[note], 0);
                     go = Instantiate(padCrystals[Random.Range(0, padCrystals.Length)], spawnPos + deltaUp, Quaternion.Euler(rotation));
 
                     break;
                 case InSceneLevel.levelType.BASS:
-                    spawnPos += new Vector3(0, stoneOffsetY[note], 0);
+                    if (note != -1) spawnPos += new Vector3(0, stoneOffsetY[note], 0);
                     go = Instantiate(bassStones[Random.Range(0, bassStones.Length)], spawnPos + deltaUp, Quaternion.Euler(rotation));
                     break;
             }
 
             go.transform.parent = currFloor.transform;
-
+           
+            if (mouseDrag) currSpawnedStone = go;
 
         bool[] don = new bool[1];
         StartCoroutine(Global.moveToInSecs(go, spawnPos, 0.5f, don));
@@ -109,7 +150,24 @@ public class GeometrySpawner : MonoBehaviour
             go.transform.parent = currFloor.transform;
         }
 
+
+        stoneBehavior s = go.GetComponent<stoneBehavior>();
+        s.index = index; s.myLevel = gameController.getCurrLevel();
     }
 
-
+    void mouseClick()
+    {
+        if (currSpawnedStone != null)
+        {
+            if (currSpawnedStone.GetComponent<stoneBehavior>().checkAssign())
+            {
+                currSpawnedStone = null;
+            }
+            else
+            {
+                Destroy(currSpawnedStone);
+                currSpawnedStone = null;
+            }
+        }
+    }
 }

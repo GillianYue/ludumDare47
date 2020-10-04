@@ -47,6 +47,11 @@ public class GameController : MonoBehaviour
         StartLevel(currLevel);
     }
 
+    public InSceneLevel getCurrLevel()
+    {
+        return m_Levels[currLevel];
+    }
+
     void OnGUI()
     {
         for (int i = 0; i < m_Levels.Length; i++)
