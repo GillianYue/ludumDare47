@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SkillManager : MonoBehaviour
+public class InstrumentManager : MonoBehaviour
 {
     public GameController gameControl;
-    public int currSkillIndex;
-    public GameObject[] SkillIcons;
+    public int currInstrIndex;
+    public GameObject[] InstrIcons;
 
     void Start()
     {
-        for(int i = 0; i<SkillIcons.Length; i++)
+        for(int i = 0; i< InstrIcons.Length; i++)
         {
-            SkillIcons[i].SetActive(i == currSkillIndex);
+            InstrIcons[i].SetActive(i == currInstrIndex);
         }
     }
 
@@ -67,9 +67,9 @@ public class SkillManager : MonoBehaviour
 
     public void updateInstrumentIcon(int index)
     {
-        SkillIcons[currSkillIndex].SetActive(false);
-        SkillIcons[index].SetActive(true);
-        currSkillIndex = index;
+        InstrIcons[currInstrIndex].SetActive(false);
+        InstrIcons[index].SetActive(true);
+        currInstrIndex = index;
     }
 
 

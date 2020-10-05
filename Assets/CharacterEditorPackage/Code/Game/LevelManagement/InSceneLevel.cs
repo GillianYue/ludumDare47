@@ -21,6 +21,8 @@ public class InSceneLevel : MonoBehaviour {
     public stoneBehavior[] stones;
     public int defaultGenerateNote;
 
+    public bool useNotes;
+
 
     void Start()
     {
@@ -64,6 +66,21 @@ public class InSceneLevel : MonoBehaviour {
         currAssignment = puzzleSpawnAssignment;
 
         yield return new WaitForSeconds(1f);
+    }
+
+    public int pickRandomNoteOption(int index)
+    {
+        int puzzleNote = puzzle[index];
+        int op1 = puzzleNote + 3, op2 = puzzleNote + 5;
+        if (op1 > 7) op1 -= 7; if (op2 > 7) op2 -= 7;
+
+        switch(Random.Range(0, 2))
+        {
+            case 0: return op2;
+            case 1: return op1;
+        }
+
+        return op1;
     }
 
     private IEnumerator waitThenMoveCam(GameObject cam, float sec, Vector3 dest, float moveTime)
@@ -122,5 +139,27 @@ public class InSceneLevel : MonoBehaviour {
     public void currentBeatStoneAnim(int index)
     {
      if(stones[index])   stones[index].beatAnim();
+    }
+
+    public void toggleNote(int index, Transform stone)
+    {
+        if (transform.tag.Equals("Space") || !useNotes) return;
+
+        int originalNote = currAssignment[index];
+        int puzzleNote = puzzle[index];
+
+        int op1 = puzzleNote + 3, op2 = puzzleNote + 5;
+        if (op1 > 7) op1 -= 7; if (op2 > 7) op2 -= 7;
+
+        currAssignment[index] = (originalNote == op1) ? (op2) : ((originalNote == op2)? puzzleNote: op1);
+
+        if(currAssignment[index] != puzzleNote) geometrySpawner.hammerSFX.Play();
+
+        Vector3 stoneY = geometrySpawner.getFloorOrigin();
+        stoneY += new Vector3(0, geometrySpawner.notesOffsetY[currAssignment[index]], 0);
+        float currX = stone.transform.position.x;
+        stone.transform.position = new Vector3(currX, stoneY.y, 0);
+
+        checkForSingleStone(index);
     }
 }

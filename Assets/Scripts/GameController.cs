@@ -34,6 +34,7 @@ public class GameController : MonoBehaviour
     public int currLevel, instrLv; //instrumentLv indicates how many instruments have been unlocked
     [HideInInspector] public Vector3 playerStartPosOffset; //offset between player view (camera) spawn pos for each level and the floor spawn pos
     public AudioSource[] instruments;
+    public InstrumentManager instrumentIcons;
 
     //indices for instruments: 
 
@@ -79,7 +80,7 @@ public class GameController : MonoBehaviour
     public IEnumerator ascendFloor()
     {
         currLevel++; instrLv++;
-
+        instrumentIcons.updateInstrumentIcon(currLevel);
         yield return StartCoroutine(geometrySpawn.spawnNewFloor(currLevel));
     }
 

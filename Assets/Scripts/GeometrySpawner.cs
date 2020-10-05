@@ -21,7 +21,7 @@ public class GeometrySpawner : MonoBehaviour
     public stoneBehavior currMouseOver;
     public Text correctNumberText;
 
-    public AudioSource placeCorrectSFX;
+    public AudioSource placeCorrectSFX, cancelSFX, hammerSFX;
 
 
     void Start()
@@ -78,7 +78,8 @@ public class GeometrySpawner : MonoBehaviour
 
         Material floorMat = floorMaterials[floorType[floorIndex]];
         GameObject f = Instantiate(floorPrefab, geometryHolder.transform);
-        f.transform.GetChild(0).GetComponent<MeshRenderer>().material = floorMat;
+        //f.transform.GetChild(0).GetComponent<MeshRenderer>().material = floorMat; TODO
+        correctNumberText.text = "";
 
         f.transform.position = startOrigin + new Vector3(0, floorIndex * dy, 0);
         currFloor = f;
@@ -114,6 +115,11 @@ public class GeometrySpawner : MonoBehaviour
                 go = Instantiate(bassStones[Random.Range(0, bassStones.Length)], pos, 
                     Quaternion.Euler(t != InSceneLevel.levelType.BASS ? new Vector3(0, 0, Random.Range(-angleNoise, angleNoise)) : Vector3.zero));
                 break;
+            case InSceneLevel.levelType.GUITAR:
+                go = Instantiate(drumCubes[Random.Range(0, drumCubes.Length)], pos,
+                Quaternion.Euler(t != InSceneLevel.levelType.BASS ? new Vector3(0, 0, Random.Range(-angleNoise, angleNoise)) : Vector3.zero));
+
+                break;
         }
 
         go.transform.parent = currFloor.transform;
@@ -123,11 +129,16 @@ public class GeometrySpawner : MonoBehaviour
         currSpawnedStone = go;
     }
 
+    public Vector3 getFloorOrigin()
+    {
+        Vector3 floorOrigin = startOrigin + new Vector3(0, gameController.currLevel * dy, 0);
+        return floorOrigin;
+    }
+
 
     private IEnumerator spawnStoneCoroutine(stoneBehavior[] stones, int index, InSceneLevel.levelType type, Vector3 deltaPosition, Vector3 rotation, int note, bool mouseDrag)
     {
-        Vector3 floorOrigin = startOrigin + new Vector3(0, gameController.currLevel * dy, 0), //starting point
-            spawnPos = floorOrigin + deltaPosition, deltaUp = new Vector3(0, 40, 0);
+        Vector3 spawnPos = getFloorOrigin() + deltaPosition, deltaUp = new Vector3(0, 40, 0);
         GameObject go = null;
 
         if (note != 0)
@@ -146,6 +157,11 @@ public class GeometrySpawner : MonoBehaviour
                 case InSceneLevel.levelType.BASS:
                     if (note != -1) spawnPos += new Vector3(0, notesOffsetY[note], 0);
                     go = Instantiate(bassStones[Random.Range(0, bassStones.Length)], spawnPos + deltaUp, Quaternion.Euler(rotation));
+                    break;
+                case InSceneLevel.levelType.GUITAR:
+                    if (note != -1) spawnPos += new Vector3(0, notesOffsetY[note], 0);
+                    go = Instantiate(drumCubes[Random.Range(0, drumCubes.Length)], spawnPos + deltaUp, Quaternion.Euler(rotation));
+
                     break;
             }
 
@@ -171,8 +187,7 @@ public class GeometrySpawner : MonoBehaviour
 
     public GameObject spawnHighlightAt(stoneBehavior[] stones, int index, Vector3 deltaPosition)
     {
-        Vector3 floorOrigin = startOrigin + new Vector3(0, gameController.currLevel * dy, 0), //starting point
-            spawnPos = floorOrigin + deltaPosition;
+        Vector3 spawnPos = getFloorOrigin() + deltaPosition;
 
         GameObject go;
         go = Instantiate(highlightPrefab, spawnPos, Quaternion.Euler(0, 0, 0));
@@ -198,6 +213,9 @@ public class GeometrySpawner : MonoBehaviour
                 Destroy(currSpawnedStone);
                 currSpawnedStone = null;
             }
+        }else if (currMouseOver != null)
+        {
+            gameController.getCurrLevel().toggleNote(currMouseOver.index, currMouseOver.transform);
         }
     }
 
@@ -206,13 +224,15 @@ public class GeometrySpawner : MonoBehaviour
     {
         if (currSpawnedStone != null)
         {
+            cancelSFX.Play();
             Destroy(currSpawnedStone);
             currSpawnedStone = null;
-        }
+        }else 
 
         if(currMouseOver != null)
         {
             currMouseOver.removeThisStone();
+            cancelSFX.Play();
         }
     }
 }

@@ -28,7 +28,7 @@ public class stoneBehavior : MonoBehaviour
         if (intersectingSpace == null) return false;
         else transform.position = intersectingSpace.transform.position;
         index = intersectingSpace.index;
-        note = myLevel.defaultGenerateNote;
+        note = (myLevel.defaultGenerateNote == -1) ? myLevel.pickRandomNoteOption(index) : myLevel.defaultGenerateNote;
         intersectingSpace.gameObject.SetActive(false);
         myLevel.setStoneAssignment(index, note, transform); //will also check for level pass
         return true;
