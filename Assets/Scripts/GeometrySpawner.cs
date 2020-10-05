@@ -12,7 +12,7 @@ public class GeometrySpawner : MonoBehaviour
     public float dy, angleNoise; //height of each floor; increment difference in height
     public int[] floorType; //stores the material index of this floor
 
-    public GameObject[] padCrystals, bassStones, drumCubes;
+    public GameObject[] padCrystals, bassStones, drumCubes, branchRocks;
     public int[] notesOffsetY; //int[7]s that indicate y offset for different notes - 0 for do, etc. 
     public GameController gameController;
     public Camera cam;
@@ -117,7 +117,7 @@ public class GeometrySpawner : MonoBehaviour
                     Quaternion.Euler(t != InSceneLevel.levelType.BASS ? new Vector3(0, 0, Random.Range(-angleNoise, angleNoise)) : Vector3.zero));
                 break;
             case InSceneLevel.levelType.GUITAR:
-                go = Instantiate(drumCubes[Random.Range(0, drumCubes.Length)], pos,
+                go = Instantiate(branchRocks[Random.Range(0, branchRocks.Length)], pos,
                 Quaternion.Euler(t != InSceneLevel.levelType.BASS ? new Vector3(0, 0, Random.Range(-angleNoise, angleNoise)) : Vector3.zero));
 
                 break;
@@ -161,7 +161,7 @@ public class GeometrySpawner : MonoBehaviour
                     break;
                 case InSceneLevel.levelType.GUITAR:
                     if (note != -1) spawnPos += new Vector3(0, notesOffsetY[note], 0);
-                    go = Instantiate(drumCubes[Random.Range(0, drumCubes.Length)], spawnPos + deltaUp, Quaternion.Euler(rotation));
+                    go = Instantiate(branchRocks[Random.Range(0, branchRocks.Length)], spawnPos + deltaUp, Quaternion.Euler(rotation));
 
                     break;
             }
