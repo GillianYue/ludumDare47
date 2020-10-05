@@ -4,6 +4,8 @@ using System.Collections;
 
 public class GameController : MonoBehaviour
 {
+
+    public bool doTitleScreen;
     //Level start event (for other scripts to use when the level is changed)
     public delegate void OnLevelStartEvent();
     public static event OnLevelStartEvent OnLevelStart;
@@ -54,7 +56,7 @@ public class GameController : MonoBehaviour
     IEnumerator initialize()
     {
 
-        yield return new WaitUntil(() => !inTitleScreen);
+        if(doTitleScreen) yield return new WaitUntil(() => !inTitleScreen);
         titlePanel.SetActive(false);
 
         yield return StartCoroutine(m_Levels[currLevel].setupLevel());
