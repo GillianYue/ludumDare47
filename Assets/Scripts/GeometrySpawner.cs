@@ -21,7 +21,8 @@ public class GeometrySpawner : MonoBehaviour
     public stoneBehavior currMouseOver;
     public Text correctNumberText;
 
-    public AudioSource placeCorrectSFX, cancelSFX, hammerSFX;
+    public AudioSource placeSFX, cancelSFX, hammerSFX, levelCompleteSFX, singleMatchCorrectSFX;
+    public Animator correctTextAnim;
 
 
     void Start()
@@ -207,6 +208,7 @@ public class GeometrySpawner : MonoBehaviour
             if (currSpawnedStone.GetComponent<stoneBehavior>().checkAssign())
             {
                 currSpawnedStone = null;
+                placeSFX.Play();
             }
             else
             {

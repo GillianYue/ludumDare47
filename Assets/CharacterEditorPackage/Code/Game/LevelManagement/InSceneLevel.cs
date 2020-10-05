@@ -22,7 +22,7 @@ public class InSceneLevel : MonoBehaviour {
     public int defaultGenerateNote;
 
     public bool useNotes;
-
+    private int currentCorrectCount;
 
     void Start()
     {
@@ -43,7 +43,7 @@ public class InSceneLevel : MonoBehaviour {
     public IEnumerator setupLevel()
     {
         yield return StartCoroutine(putPuzzlesInPlace());
-        checkForLevelPass();
+        checkForLevelPass(false);
     }
 
     private IEnumerator putPuzzlesInPlace()
@@ -102,8 +102,10 @@ public class InSceneLevel : MonoBehaviour {
         }
     }
 
-    public void checkForLevelPass()
+    public void checkForLevelPass(bool effect)
     {
+        int previous = currentCorrectCount;
+
         int correctCount = 0;
         for(int a = 0; a<16; a++)
         {
@@ -111,24 +113,38 @@ public class InSceneLevel : MonoBehaviour {
             //else Debug.Log("mismatch at " + a + ": curr " + currAssignment[1] + " and puzzle " + puzzle[a]);
         }
 
+        if (correctCount > previous && effect) {
+            StartCoroutine(delayEffect());
+        }
         geometrySpawner.correctNumberText.text = correctCount.ToString() + "/16";
         if (correctCount == 16)
         {
+            for(int s = 0; s<16; s++)
+            {
+                if(currAssignment[s] != 0)
+                {
+                    Global.horizShakeAnim(stones[s].gameObject, this);
+                }
+            }
+            geometrySpawner.levelCompleteSFX.Play();
             StartCoroutine(geometrySpawner.gameController.ascendFloor());
             gameObject.SetActive(false);
         }
+
+        currentCorrectCount = correctCount;
+    }
+
+    IEnumerator delayEffect()
+    {
+        yield return new WaitForSeconds(0.6f);
+        geometrySpawner.correctTextAnim.SetTrigger("a");
+        geometrySpawner.singleMatchCorrectSFX.Play();
     }
 
     public bool checkForSingleStone(int index)
     {
-        checkForLevelPass();
-        if (currAssignment[index] == puzzle[index])
-        {
-
-            geometrySpawner.placeCorrectSFX.Play();
-            return true;
-        }
-        else return false;
+        checkForLevelPass(true);
+        return (currAssignment[index] == puzzle[index]);
     }
 
     public bool canModifyStone(int index)
