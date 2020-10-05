@@ -7,13 +7,14 @@ public class InstrumentManager : MonoBehaviour
 {
     public GameController gameControl;
     public int currInstrIndex;
-    public GameObject[] InstrIcons;
+    public GameObject[] InstrIcons, spawnIcons;
 
     void Start()
     {
         for(int i = 0; i< InstrIcons.Length; i++)
         {
             InstrIcons[i].SetActive(i == currInstrIndex);
+            spawnIcons[i].SetActive(i == currInstrIndex);
         }
     }
 
@@ -29,48 +30,25 @@ public class InstrumentManager : MonoBehaviour
         }*/
     }
 
-/*    public void nextSkill()
-    {
-        Debug.Log("in next: " + currSkillIndex);
-        if (currSkillIndex == gameControl.SkillLv)
-        { //maxed out
-            updateSkillIcon(0);
-        }
-        else
-        {
-            updateSkillIcon(currSkillIndex + 1);
-        }
-
-    }
-
-    public void previousSkill()
-    {
-        if(currSkillIndex == 0)
-        {
-            updateSkillIcon(gameControl.SkillLv);
-        }
-        else
-        {
-            updateSkillIcon(currSkillIndex-1);
-        }
-    }
-
-    public void updateSkillIcon(int index)
-    {
-        if (gameControl.SkillLv < index) return;
-
-        //TODO livelier transition
-        SkillIcons[currSkillIndex].SetActive(false);
-        SkillIcons[index].SetActive(true);
-        currSkillIndex = index;
-    }*/
 
     public void updateInstrumentIcon(int index)
     {
         InstrIcons[currInstrIndex].SetActive(false);
         InstrIcons[index].SetActive(true);
+
+        spawnIcons[currInstrIndex].SetActive(false);
+        spawnIcons[index].SetActive(true);
+
         currInstrIndex = index;
     }
 
+    public void disableAll()
+    {
+        for (int i = 0; i < InstrIcons.Length; i++)
+        {
+            InstrIcons[i].SetActive(false);
+            spawnIcons[i].SetActive(false);
+        }
+    }
 
 }

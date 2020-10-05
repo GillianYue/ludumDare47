@@ -14,8 +14,12 @@ public class GameController : MonoBehaviour
 
     static GameController g_gameController;
     public int currentBeat; public Text beatText;
-    public Animator beatAnimator;
+    public Animator beatAnimator, endingA;
     private IEnumerator currentBeatCount;
+
+    bool inTitleScreen = true;
+
+
     public static GameController Get()
     {
         if (g_gameController == null)
@@ -35,6 +39,7 @@ public class GameController : MonoBehaviour
     [HideInInspector] public Vector3 playerStartPosOffset; //offset between player view (camera) spawn pos for each level and the floor spawn pos
     public AudioSource[] instruments;
     public InstrumentManager instrumentIcons;
+    public GameObject titlePanel, leftMoveArrow, rightMoveArrow;
 
     //indices for instruments: 
 
@@ -43,13 +48,29 @@ public class GameController : MonoBehaviour
         playerStartPosOffset = m_Camera.transform.position - geometrySpawn.getStartOrigin(); //assumes camera on start is in its place
 
         StartCoroutine(initialize());
+        endingA.gameObject.SetActive(false);
     }
 
     IEnumerator initialize()
     {
+
+        yield return new WaitUntil(() => !inTitleScreen);
+        titlePanel.SetActive(false);
+
         yield return StartCoroutine(m_Levels[currLevel].setupLevel());
         StartLevel(currLevel);
     }
+
+    public void titleScreenStartGame()
+    {
+        inTitleScreen = false;
+    }
+
+    public void titleScreenExitGame()
+    {
+        Application.Quit();
+    }
+
 
     public InSceneLevel getCurrLevel()
     {
@@ -80,8 +101,28 @@ public class GameController : MonoBehaviour
     public IEnumerator ascendFloor()
     {
         currLevel++; instrLv++;
-        instrumentIcons.updateInstrumentIcon(currLevel);
-        yield return StartCoroutine(geometrySpawn.spawnNewFloor(currLevel));
+        if (currLevel != 4)
+        {
+            instrumentIcons.updateInstrumentIcon(currLevel);
+            yield return StartCoroutine(geometrySpawn.spawnNewFloor(currLevel));
+        }
+        else
+        {
+            StartCoroutine(ending());
+        }
+    }
+
+    IEnumerator ending()
+    {
+        StopCoroutine(currentBeatCount);
+        geometrySpawn.correctNumberText.text = "";
+        beatText.gameObject.SetActive(false);
+        instrumentIcons.disableAll();
+        leftMoveArrow.SetActive(false);
+        rightMoveArrow.SetActive(false);
+        yield return StartCoroutine(CorrectCamera());
+        yield return new WaitForSeconds(1);
+        endingA.gameObject.SetActive(true);
     }
 
     public void setUpCurrLevel()
